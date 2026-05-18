@@ -199,37 +199,43 @@ def evaluate(K,a,b,evaluation,outfile): # Obtiene las predicciones del modelo pa
     res = []
     with open(outfile, "w") as out:
         for m, s1, s2 in evaluation:
-            s1 = max(float(s1), 1e-12)
+            input_est = float(s1)
+            s1 = max(input_est, 1e-12)
             pred = float(a * s1**b)
-            res.append((m, s1, pred, s2))
+            res.append((m, input_est, pred, s2))
             out.write(f"{m} {s1} {pred} {s2}\n")
     
     sec = 0
+    see = 0
     sem = 0
     sde = 0
     n = 0
     for i in res:
         mi = i[0]
+        eei = i[1]
         epi = i[2]
         emi = i[3]
 
         n += mi
+        see += (mi * eei)
         sec += (mi * epi)
         sem += (mi * emi)
         sde += (mi * abs(emi - epi))
     
+    eee = see / n
     eca = sec / n
     eem = sem / n
     ede = sde / n
 
-    Eh = 100*eca
+    Ee = 100*eee
+    Ecal = 100*eca
     E = 100*eem
     DE = 100*abs(eca-eem)
     dE = 100*ede
     rDE = DE/eem
     rdE = dE/eem
 
-    return Eh, E, DE, dE, rDE, rdE
+    return Ecal, Ee, E, DE, dE, rDE, rdE
 
 def guardar_metadata(metadata_path, metadata):
     with open(metadata_path, "w") as out:
@@ -467,7 +473,9 @@ exec {python_path!r} "$SCRIPT_DIR/{script_name}" "$@"
     os.chmod(shell_path, 0o755)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        epilog="Métricas de salida: Ecal=error calibrado (%), Ee=error estimado de entrada (%), E=error empírico (%), DE=|Ecal-E| (%)."
+    )
 
     parser.add_argument("archivo1", type=str) # Archivo de calibración
     parser.add_argument("archivo2", type=str) # Archivo de evaluación
@@ -557,9 +565,10 @@ if __name__ == "__main__":
     print()
 
     predictions_file = os.path.join(predictions_dir, f"predictions{suffix}")
-    Eh, E, DE, dE, rDE, rdE = evaluate(K, a, b, evaluation, predictions_file)
+    Ecal, Ee, E, DE, dE, rDE, rdE = evaluate(K, a, b, evaluation, predictions_file)
 
-    print(f"Eh: {Eh}")
+    print(f"Ecal: {Ecal}")
+    print(f"Ee: {Ee}")
     print(f"E: {E}")
     print(f"DE: {DE}")
     print(f"dE: {dE}")
@@ -603,7 +612,8 @@ if __name__ == "__main__":
             "a": a,
             "b": b,
             "WSSR": ws,
-            "Eh": Eh,
+            "Ecal": Ecal,
+            "Ee": Ee,
             "E": E,
             "DE": DE,
             "dE": dE,
@@ -642,8 +652,9 @@ if __name__ == "__main__":
         print(f"WSSR --> {ws_trim}")
         print()
         predictions_file_trim = os.path.join(trim_predictions_dir, f"predictions_trim{suffix}")
-        Eh_trim, E_trim, DE_trim, dE_trim, rDE_trim, rdE_trim = evaluate(K, a_trim, b_trim, evaluation, predictions_file_trim)
-        print(f"Eh: {Eh_trim}")
+        Ecal_trim, Ee_trim, E_trim, DE_trim, dE_trim, rDE_trim, rdE_trim = evaluate(K, a_trim, b_trim, evaluation, predictions_file_trim)
+        print(f"Ecal: {Ecal_trim}")
+        print(f"Ee: {Ee_trim}")
         print(f"E: {E_trim}")
         print(f"DE: {DE_trim}")
         print(f"dE: {dE_trim}")
@@ -658,7 +669,8 @@ if __name__ == "__main__":
             "a_trim": a_trim,
             "b_trim": b_trim,
             "WSSR_trim": ws_trim,
-            "Eh_trim": Eh_trim,
+            "Ecal_trim": Ecal_trim,
+            "Ee_trim": Ee_trim,
             "E_trim": E_trim,
             "DE_trim": DE_trim,
             "dE_trim": dE_trim,

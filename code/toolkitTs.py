@@ -217,7 +217,19 @@ def group_results(empirical_error, probs, T, K, t):
 
     return parsed
 
-def evaluate_ts(parsed, output_file): # Calcula las métricas de error Eh, E, DE, dE, rDE y rdE a partir de los resultados agrupados (n, avg_real, avg_est) y guarda los resultados en un archivo de texto.
+def input_estimated_error(values):
+    values = np.asarray(values, dtype=float)
+    return 100 * float(np.mean(values))
+
+def grouped_input_estimated_error(parsed):
+    sec = 0.0
+    n = 0.0
+    for m, est_error, _ in parsed:
+        n += m
+        sec += m * float(est_error)
+    return 100 * (sec / n)
+
+def evaluate_ts(parsed, output_file): # Calcula las métricas de error Ecal, E, DE, dE, rDE y rdE a partir de los resultados agrupados (n, avg_real, avg_est) y guarda los resultados en un archivo de texto.
     sec = 0.0
     sem = 0.0
     sde = 0.0
@@ -248,14 +260,14 @@ def evaluate_ts(parsed, output_file): # Calcula las métricas de error Eh, E, DE
     eem = sem / n
     ede = sde / n
 
-    Eh = 100 * eca
+    Ecal = 100 * eca
     E = 100 * eem
     DE = 100 * abs(eca - eem)
     dE = 100 * ede
     rDE = DE / eem if eem > 0 else float("inf")
     rdE = dE / eem if eem > 0 else float("inf")
 
-    return Eh, E, DE, dE, rDE, rdE
+    return Ecal, E, DE, dE, rDE, rdE
 
 def save_grouped_results(parsed, output_file):
     with open(output_file, "w") as out:
@@ -268,7 +280,9 @@ def guardar_metadata(metadata_path, metadata):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        epilog="Métricas de salida: Ecal=error calibrado (%), Ee=error estimado de entrada (%), E=error empírico (%), DE=|Ecal-E| (%)."
+    )
 
     parser.add_argument("archivo1", type=str, help="Archivo de calibración")
     parser.add_argument("archivo2", type=str, help="Archivo de evaluación")
@@ -305,12 +319,14 @@ if __name__ == "__main__":
 
         if grouped:
             parsed_calib, parsed = given_grouped(archivo1, archivo2)
+            Ee = grouped_input_estimated_error(parsed)
             T = None
         else:
             calibration, evaluation = CalibEvDone(archivo1, archivo2)
 
             y_calib, est_calib, pos_calib, probs_calib = get_data(calibration)
             y_eval, est_eval, pos_eval, probs_eval = get_data(evaluation)
+            Ee = input_estimated_error(est_eval)
 
             if opt == "ce":
                 T = optimize_temperature_ce(probs_calib, pos_calib)
@@ -343,14 +359,15 @@ if __name__ == "__main__":
             save_grouped_results(parsed, eval_agrup_path)
 
         predictions_file = os.path.join(predictions_dir, f"predictions{suffix}")
-        Eh, E, DE, dE, rDE, rdE = evaluate_ts(parsed, predictions_file)
+        Ecal, E, DE, dE, rDE, rdE = evaluate_ts(parsed, predictions_file)
 
         print("\n=== RESULTADOS ===")
         if grouped:
             print("T   = no optimizada (--grouped)")
         else:
             print(f"T   = {T:.6f}")
-        print(f"Eh  = {Eh:.4f}%")
+        print(f"Ecal = {Ecal:.4f}%")
+        print(f"Ee   = {Ee:.4f}%")
         print(f"E   = {E:.4f}%")
         print(f"DE  = {DE:.4f}%")
         print(f"dE  = {dE:.4f}%")
@@ -370,7 +387,8 @@ if __name__ == "__main__":
             },
             "results": {
                 "T": T,
-                "Eh": Eh,
+                "Ecal": Ecal,
+                "Ee": Ee,
                 "E": E,
                 "DE": DE,
                 "dE": dE,

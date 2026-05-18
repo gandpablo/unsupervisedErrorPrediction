@@ -312,7 +312,7 @@ Se aplica temperatura `T`:
 p_i' = p_i^(1/T) / sum_j p_j^(1/T)
 ```
 
-El error estimado por muestra es:
+El error calibrado por muestra tras aplicar `T` es:
 
 ```text
 1 - max(p_i)
@@ -326,13 +326,14 @@ Optimización de `T`:
 
 ---
 
-### 6.6 Métricas finales
+### 6.6 Métricas finales (output)
 
 Calculadas sobre la evaluación agrupada:
 
-* `Eh`: error estimado (%)
+* `Ecal`: error calibrado (%)
+* `Ee`: error estimado de entrada (%), media de `1-Pmax`
 * `E`: error empírico (%)
-* `DE`: |Eh - E| (%)
+* `DE`: |Ecal - E| (%)
 * `dE`: error absoluto medio (%)
 * `rDE`: DE / E
 * `rdE`: dE / E
@@ -401,7 +402,7 @@ Incluye:
 
 * inputs del experimento
 * parámetros usados
-* métricas finales
+* métricas finales (`Ecal`, `Ee`, `E`, `DE`, `dE`, `rDE`, `rdE`)
 * parámetros del modelo (`a,b` o `T`)
 * resultados de trimming (si aplica)
 

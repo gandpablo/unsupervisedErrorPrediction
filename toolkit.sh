@@ -51,6 +51,12 @@ if [ $# -eq 0 ] || [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "---help" 
     echo "  sx  -> ajuste con Simplex"
     echo "  ts  -> temperature scaling"
     echo
+    echo "Metricas de salida:"
+    echo "  Ecal -> error calibrado (%)"
+    echo "  Ee   -> error estimado de entrada (%), media de 1-Pmax"
+    echo "  E    -> error empirico (%)"
+    echo "  DE   -> |Ecal - E| (%)"
+    echo
     echo "Ejemplos:"
     echo 
     echo "  estimator lm examples/calibration.txt examples/evaluation.txt results 3 \\"
