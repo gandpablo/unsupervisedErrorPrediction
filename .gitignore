@@ -10,3 +10,6 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+
+.debug/
+.debug_lm.ipynb
