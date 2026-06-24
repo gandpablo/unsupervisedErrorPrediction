@@ -1,13 +1,13 @@
-# GUÍA RÁPIDA DE USO DE ESTIMATOR
+# ESTIMATOR QUICK START GUIDE
 
-## 1. Versiones
+## 1. Versions
 
-Las versiones soportadas para ejecutar la herramienta son:
+The supported versions for running the tool are:
 
-* Python soportado: 3.9 – 3.13
-* Python recomendado: 3.12
+* Supported Python: 3.9 - 3.13
+* Recommended Python: 3.12
 
-Dependencias según versión:
+Dependencies by version:
 
 * Python 3.9:
 
@@ -15,44 +15,43 @@ Dependencias según versión:
   * SciPy 1.13.1
   * Matplotlib 3.9.4
 
-* Python 3.10 – 3.13:
+* Python 3.10 - 3.13:
 
   * NumPy 2.2.6
   * SciPy 1.15.2
   * Matplotlib 3.10.8
 
-Se instalarán solas al usar install.sh, o se indicará al usuario
-como instalar
+They will be installed automatically when using `install.sh`, or the user
+will be told how to install them.
 
 ---
 
-## 2. Instalación
+## 2. Installation
 
-Desde la carpeta del repositorio:
+From the repository folder:
 
 ```bash
 chmod +x install.sh toolkit.sh
 ./install.sh
 ```
 
-El instalador:
+The installer:
 
-* comprueba que exista una versión de Python compatible
-* comprueba que el módulo `venv` esté disponible
-* crea el entorno virtual `.toolkit2venv`
-* instala las dependencias necesarias
-* instala el comando `estimator` en `~/.local/bin`
+* checks that a compatible Python version exists
+* checks that the `venv` module is available
+* creates the `.toolkit2venv` virtual environment
+* installs the required dependencies
+* installs the `estimator` command in `~/.local/bin`
 
 ### PATH
 
-Si `~/.local/bin` no está en el `PATH`, debes añadir:
+If `~/.local/bin` is not in the `PATH`, add:
 
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
-Después, puedes comprobar la instalación usando
-desde una terminal nueva:
+Then, from a new terminal, you can check the installation using:
 
 ```bash
 estimator --help
@@ -60,157 +59,157 @@ estimator --help
 
 ---
 
-## 3. Funcionamiento
+## 3. How It Works
 
-El comando `estimator` ejecuta tres tipos de cálculo:
+The `estimator` command runs three types of computation:
 
-* `lm`: ajuste de la curva `f(x)=a*x^b` mediante Levenberg-Marquardt
+* `lm`: fits the curve `f(x)=a*x^b` using Levenberg-Marquardt
 
-* `sx`: ajuste de la misma curva mediante Simplex (Nelder-Mead)
+* `sx`: fits the same curve using Simplex (Nelder-Mead)
 
-* `ts`: calibración mediante temperature scaling sobre probabilidades
+* `ts`: calibration using temperature scaling over probabilities
 
-En todos los casos:
+In all cases:
 
-* se leen ficheros de calibración y evaluación
-* se agrupan los datos en bloques
-* se calcula la calibración
-* se guardan resultados estructurados en un directorio
+* calibration and evaluation files are read
+* data are grouped into blocks
+* calibration is computed
+* structured results are saved in a directory
 
 ---
 
-## 4. Uso
+## 4. Usage
 
-### 4.1 Sintaxis general
+### 4.1 General Syntax
 
-Para `lm` y `sx`:
+For `lm` and `sx`:
 
 ```bash
-estimator lm|sx archivo_calibracion archivo_evaluacion outdir [K] [--remain] \
-  [--trim:VALOR]
+estimator lm|sx calibration_file evaluation_file outdir [K] [--remain] \
+  [--trim:VALUE]
 ```
 
-Para `ts`:
+For `ts`:
 
 ```bash
-estimator ts archivo_calibracion archivo_evaluacion outdir [K] [--remain] \
+estimator ts calibration_file evaluation_file outdir [K] [--remain] \
   [ce|dE|DE]
 ```
 
-Para ficheros que ya vienen agrupados:
+For files that are already grouped:
 
 ```bash
-estimator lm|sx archivo_calibracion_agrupada archivo_evaluacion_agrupada \
-  outdir K --grouped [--remain] [--trim:VALOR]
+estimator lm|sx grouped_calibration_file grouped_evaluation_file \
+  outdir K --grouped [--remain] [--trim:VALUE]
 
-estimator ts archivo_calibracion_agrupada archivo_evaluacion_agrupada \
+estimator ts grouped_calibration_file grouped_evaluation_file \
   outdir K --grouped [--remain]
 ```
 
 ---
 
-### 4.2 Parámetros
+### 4.2 Parameters
 
-* `lm | sx | ts`: tipo de cálculo
-* `archivo_calibracion`: fichero para ajustar el modelo (.txt, .out, ...)
-* `archivo_evaluacion`: fichero para evaluar el modelo (.txt, .out, ...)
-* `outdir`: directorio raíz de salida
-* `K`: número de grupos (por defecto `100` si no se usa `--grouped`).
-  Con `--grouped` es obligatorio, aunque sólo se usa para nombrar la
-  carpeta del experimento
+* `lm | sx | ts`: computation type
+* `calibration_file`: file used to fit the model (.txt, .out, ...)
+* `evaluation_file`: file used to evaluate the model (.txt, .out, ...)
+* `outdir`: root output directory
+* `K`: number of groups (default: `100` if `--grouped` is not used).
+  With `--grouped`, it is required, although it is only used to name the
+  experiment folder
 
-Opcionales:
+Optional:
 
-* `--remain`: el resto se guarda como último bloque independiente
-* (sin flag) el resto se fusiona en el último bloque y la ruta usa `t0`
-* `--grouped`: los ficheros de entrada ya están agrupados; en este modo
-  `K` y `t` no se usan para calcular, sólo para que las rutas de salida
-  sean comprensibles
-* si detecta exactamente el mismo experimento en el mismo `outdir`,
-  avisa y pide confirmación antes de recalcular y sobrescribir
+* `--remain`: the remainder is saved as an independent final block
+* (without this flag) the remainder is merged into the last block and the
+  path uses `t0`
+* `--grouped`: the input files are already grouped; in this mode `K` and
+  `t` are not used for computation, only to make the output paths
+  understandable
+* if the exact same experiment is detected in the same `outdir`, the tool
+  warns and asks for confirmation before recalculating and overwriting
 
-Solo para `lm` y `sx`:
+Only for `lm` and `sx`:
 
-* `--trim:VALOR`: activa trimming de outliers
+* `--trim:VALUE`: enables outlier trimming
 
-Solo para `ts`:
+Only for `ts`:
 
-* `ce | dE | DE`: criterio de optimización (por defecto `ce`)
+* `ce | dE | DE`: optimization criterion (default: `ce`)
 
 ---
 
-## 5. Formato de los ficheros (input)
+## 5. File Format (Input)
 
-### 5.1 Para `lm` y `sx`
+### 5.1 For `lm` and `sx`
 
-Cada línea debe contener al menos dos valores:
+Each line must contain at least two values:
 
 ```text
-error_empirico error_estimado
+empirical_error estimated_error
 ```
 
-Donde:
+Where:
 
-* `error_empirico`:
+* `empirical_error`:
 
-  * `0` si la predicción es correcta
-  * `1` si es incorrecta
+  * `0` if the prediction is correct
+  * `1` if it is incorrect
 
-* `error_estimado`:
+* `estimated_error`:
 
-  * típicamente `1 - max(P(c|x))`
-  * donde `P(c|x)` es la probabilidad softmax de la clase más probable
+  * typically `1 - max(P(c|x))`
+  * where `P(c|x)` is the softmax probability of the most likely class
 
 ---
 
-### 5.2 Para `ts`
+### 5.2 For `ts`
 
-Cada línea debe contener al menos cinco columnas:
+Each line must contain at least five columns:
 
 ```text
 E  1-Pmax  y_true  y_pred  P0  P1 ... Pn
 ```
 
-Donde:
+Where:
 
-* `E`: error empírico (0 o 1)
-* `1-Pmax`: error estimado = `1 - max(P(c|x))`
-* `y_true`: índice de la clase correcta
-* `y_pred`: índice de la clase predicha
-* `P0 ... Pn`: probabilidades por clase
+* `E`: empirical error (0 or 1)
+* `1-Pmax`: estimated error = `1 - max(P(c|x))`
+* `y_true`: index of the correct class
+* `y_pred`: index of the predicted class
+* `P0 ... Pn`: class probabilities
 
-Importante:
+Important:
 
-* Las probabilidades deben ser **salidas softmax (no logits)**
-* Deben sumar 1
+* Probabilities must be **softmax outputs (not logits)**
+* They must sum to 1
 
 ---
 
-### 5.3 Para `--grouped`
+### 5.3 For `--grouped`
 
-Cuando los ficheros de calibración y evaluación ya están agrupados,
-deben tener el mismo formato que genera el toolkit en `grouped/`:
+When the calibration and evaluation files are already grouped, they must
+have the same format generated by the toolkit in `grouped/`:
 
 ```text
-m  media_estimada  media_empirica
+m  estimated_mean  empirical_mean
 ```
 
-En este modo:
+In this mode:
 
-* se pasa `K`
-* si aparece `--remain`, la ruta usa `t1`; si no aparece, usa `t0`
-* `K` y `t` no se usan para reagrupar ni para recalcular los datos; sólo
-  se guardan en `metadata.json` y en el nombre de la carpeta del
-  experimento
-* no se genera la carpeta superior `grouped/` con una nueva agrupación
-  de calibración/evaluación
-* `lm` y `sx` ajustan el modelo con la calibración agrupada y evalúan
-  sobre la evaluación agrupada
-* `ts` calcula las métricas directamente sobre la evaluación agrupada;
-  no optimiza `T`, porque el fichero agrupado ya no contiene las
-  probabilidades por clase necesarias para recalibrar temperatura
+* `K` is passed
+* if `--remain` appears, the path uses `t1`; otherwise, it uses `t0`
+* `K` and `t` are not used to regroup or recompute the data; they are only
+  saved in `metadata.json` and in the experiment folder name
+* the upper `grouped/` folder with a new calibration/evaluation grouping
+  is not generated
+* `lm` and `sx` fit the model with the grouped calibration file and evaluate
+  on the grouped evaluation file
+* `ts` computes the metrics directly on the grouped evaluation file; it does
+  not optimize `T`, because the grouped file no longer contains the class
+  probabilities required to recalibrate temperature
 
-Ejemplos:
+Examples:
 
 ```bash
 estimator lm grouped/calibrationK100 grouped/evaluationK100 results 100 \
@@ -224,143 +223,143 @@ estimator ts grouped/calibrationK100 grouped/evaluationK100 results 100 \
 
 ---
 
-## 6. Cálculos que realiza
+## 6. Computations Performed
 
-### 6.1 Agrupación
+### 6.1 Grouping
 
-Los datos se ordenan por el valor estimado y se dividen en `K` bloques.
+The data are sorted by the estimated value and divided into `K` blocks.
 
-Sea `n` el número total de muestras:
+Let `n` be the total number of samples:
 
 ```text
 M = n // K
 r = n % K
 ```
 
-Para cada bloque se calcula:
+For each block, the following are computed:
 
-* tamaño (`m_i`)
-* media estimada (`x_i`)
-* media empírica (`y_i`)
+* size (`m_i`)
+* estimated mean (`x_i`)
+* empirical mean (`y_i`)
 
-Tratamiento del resto:
+Remainder handling:
 
-* con `--remain`: bloque final de tamaño `r`
-* sin `--remain`: último bloque de tamaño `M + r`
+* with `--remain`: final block of size `r`
+* without `--remain`: last block of size `M + r`
 
 ---
 
-### 6.2 Ajuste `lm`
+### 6.2 `lm` Fit
 
-Se ajusta:
+The fitted function is:
 
 ```text
 f(x) = a * x^b
 ```
 
-Minimizando:
+Minimizing:
 
 ```text
 sum_i m_i * (y_i - a*x_i^b)^2
 ```
 
-Usando `least_squares` (método LM).
+Using `least_squares` (LM method).
 
 ---
 
-### 6.3 Ajuste `sx`
+### 6.3 `sx` Fit
 
-Se ajusta:
+The fitted function is:
 
 ```text
 f(x) = a * x^b
 ```
 
-Minimizando:
+Minimizing:
 
 ```text
 sum_i m_i * |y_i - a*x_i^b|
 ```
 
-Usando `minimize` (Nelder-Mead).
+Using `minimize` (Nelder-Mead).
 
 ---
 
-### 6.4 Trimming de outliers
+### 6.4 Outlier Trimming
 
-Solo en `lm` y `sx`.
+Only in `lm` and `sx`.
 
-Proceso:
+Process:
 
-1. Ajuste inicial
-2. Cálculo de residuos ponderados
-3. Eliminación de outliers fuera de:
+1. Initial fit
+2. Computation of weighted residuals
+3. Removal of outliers outside:
 
 ```text
-[media - lim*std, media + lim*std]
+[mean - lim*std, mean + lim*std]
 ```
 
-4. Reajuste del modelo
+4. Model refit
 
 ---
 
-### 6.5 Temperature scaling
+### 6.5 Temperature Scaling
 
-Se aplica temperatura `T`:
+Temperature `T` is applied:
 
 ```text
 p_i' = p_i^(1/T) / sum_j p_j^(1/T)
 ```
 
-El error calibrado por muestra tras aplicar `T` es:
+The calibrated error per sample after applying `T` is:
 
 ```text
 1 - max(p_i)
 ```
 
-Optimización de `T`:
+Optimization of `T`:
 
-* `ce`: entropía cruzada
-* `dE`: error absoluto medio
-* `DE`: diferencia entre medias
+* `ce`: cross-entropy
+* `dE`: mean absolute error
+* `DE`: difference between means
 
 ---
 
-### 6.6 Métricas finales (output)
+### 6.6 Final Metrics (Output)
 
-Calculadas sobre la evaluación agrupada:
+Computed on the grouped evaluation:
 
-* `Ecal`: error calibrado (%)
-* `Ee`: error estimado de entrada (%), media de `1-Pmax`
-* `E`: error empírico (%)
+* `Ecal`: calibrated error (%)
+* `Ee`: input estimated error (%), mean of `1-Pmax`
+* `E`: empirical error (%)
 * `DE`: |Ecal - E| (%)
-* `dE`: error absoluto medio (%)
+* `dE`: mean absolute error (%)
 * `rDE`: DE / E
 * `rdE`: dE / E
 
-Además:
+Also:
 
-* `lm`, `sx`: guardan `a`, `b`
-* `ts`: guarda `T`
+* `lm`, `sx`: save `a`, `b`
+* `ts`: saves `T`
 
 ---
 
-## 7. Salidas generadas
+## 7. Generated Outputs
 
-Cada ejecución crea una carpeta dentro de `outdir`.
+Each run creates a folder inside `outdir`.
 
 ### 7.1 `lm`
 
 ```text
 outdir/
-└── lm_K{K}_t{0|1}_tr{0|1}_lim{valor}/
+└── lm_K{K}_t{0|1}_tr{0|1}_lim{value}/
 ```
 
 ### 7.2 `sx`
 
 ```text
 outdir/
-└── simplex_K{K}_t{0|1}_tr{0|1}_lim{valor}/
+└── simplex_K{K}_t{0|1}_tr{0|1}_lim{value}/
 ```
 
 ### 7.3 `ts`
@@ -370,47 +369,47 @@ outdir/
 └── ts_K{K}_t{0|1}_{ce|dE|DE}/
 ```
 
-Con `--grouped`:
+With `--grouped`:
 
 ```text
 outdir/
-├── lm_grouped_K{K}_t{0|1}_tr{0|1}_lim{valor}/
-├── simplex_grouped_K{K}_t{0|1}_tr{0|1}_lim{valor}/
+├── lm_grouped_K{K}_t{0|1}_tr{0|1}_lim{value}/
+├── simplex_grouped_K{K}_t{0|1}_tr{0|1}_lim{value}/
 └── ts_grouped_K{K}_t{0|1}/
 ```
 
-Contenido común:
+Common content:
 
 * `metadata.json`
 * `predictions/`
 * `plots/`
 * `scripts/`
 
-Además, cuando no se usa `--grouped`, se genera:
+In addition, when `--grouped` is not used, the following is generated:
 
 * `grouped/`
 
-Opcional:
+Optional:
 
-* `trim/` (si se activa trimming)
+* `trim/` (if trimming is enabled)
 
 ---
 
 ### 7.4 `metadata.json`
 
-Incluye:
+Includes:
 
-* inputs del experimento
-* parámetros usados
-* métricas finales (`Ecal`, `Ee`, `E`, `DE`, `dE`, `rDE`, `rdE`)
-* parámetros del modelo (`a,b` o `T`)
-* resultados de trimming (si aplica)
+* experiment inputs
+* parameters used
+* final metrics (`Ecal`, `Ee`, `E`, `DE`, `dE`, `rDE`, `rdE`)
+* model parameters (`a,b` or `T`)
+* trimming results (if applicable)
 
 ---
 
-## 8. Ejemplos de uso
+## 8. Usage Examples
 
-En base ficheros de `examples/`
+Based on files in `examples/`
 
 ### 8.1 `lm`
 
@@ -433,7 +432,7 @@ estimator ts examples/calibration_ts.txt examples/evaluation_ts.txt \
   examples/results_ts 3 dE --remain
 ```
 
-### 8.4 Ficheros ya agrupados
+### 8.4 Already Grouped Files
 
 ```bash
 estimator lm examples/results_lm/lm_K3_t1_tr1_lim1.5/grouped/calibrationK3 \
@@ -441,22 +440,22 @@ estimator lm examples/results_lm/lm_K3_t1_tr1_lim1.5/grouped/calibrationK3 \
   examples/results_lm_grouped 3 --grouped --remain --trim:1.5
 ```
 
-### 8.5 Ejecución de código para generación de gráficos
+### 8.5 Running Code to Generate Plots
 
-En los experimentos `lm` y `sx`, dentro de `scripts/` se genera un
-script `*.py` por gráfico y otro `*.sh` con el mismo nombre base.
+In `lm` and `sx` experiments, a `*.py` script is generated inside `scripts/`
+for each plot, together with a `*.sh` script with the same base name.
 
-El archivo que se debe editar para cambiar colores, ejes, tamaños o
-cualquier otro detalle del gráfico es el `*.py` generado.
+The file that should be edited to change colors, axes, sizes, or any other
+plot detail is the generated `*.py` file.
 
-El archivo `.sh` se genera solo como ayuda para ejecutar ese `*.py`
-usando el Python del entorno creado con `install.sh`, así que no hace
-falta lanzar el script Python manualmente.
+The `.sh` file is generated only as a helper to run that `*.py` file using
+the Python from the environment created with `install.sh`, so the Python
+script does not need to be launched manually.
 
-Al ejecutarlo, se sobrescribe el PDF por defecto que ya existe en la
-carpeta `plots/` del experimento.
+When it is executed, the default PDF that already exists in the experiment
+`plots/` folder is overwritten.
 
-Ejemplo completo usando los ficheros de `examples/`:
+Complete example using the files in `examples/`:
 
 ```bash
 estimator lm examples/calibration.txt examples/evaluation.txt \
